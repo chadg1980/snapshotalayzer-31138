@@ -7,6 +7,7 @@ ec2 = session.resource('ec2')
 @click.command()
 def list_instances():
     "list_instances\t\tList EC2 instances"
+    print("listing instances")
     for x in ec2.instances.all():
         print(', '.join((
             x.id,
@@ -18,3 +19,4 @@ def list_instances():
     
 if __name__ == '__main__':
     list_instances()
+    
