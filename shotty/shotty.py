@@ -1,5 +1,6 @@
 import boto3
 import click
+import botocore
 
 session = boto3.Session(profile_name='shotty')
 ec2 = session.resource('ec2')
@@ -22,6 +23,7 @@ def cli():
 @cli.group('snapshots')
 def snapshots():
     """commands for snapshots"""
+
 @snapshots.command('list')
 @click.option('--project', default=None, 
 help="Only snapshots for project (tag Project:<name>)")
@@ -42,7 +44,6 @@ def list_snapshots(project):
                     s.start_time.strftime("%c")
                 )))
     return
-
 
 #volumes
 @cli.group('volumes')
@@ -102,8 +103,14 @@ def stop_instance(project):
 
     for i in instances:
         print("Stopping {0}...".format(i.id))
-        i.stop()
+        try:
+            i.stop()
+        except botocore.exceptions.ClientError as e:
+            print(" Could not stop {0} ".format(i.id) + str(e))
+            continue
     return
+
+
 @instances.command('start')
 @click.option('--project', default=None, help="Only instances for project")
 def start_instance(project):
@@ -112,7 +119,11 @@ def start_instance(project):
 
     for i in instances:
         print("Starting {0}...".format(i.id))
-        i.start()
+        try:
+            i.start()
+        except botocore.exceptions.ClientError as e:
+            print(" Could not start {0} ".format(i.id) + str(e))
+            continue
     return
 
 #take snapshot of the instance
@@ -135,7 +146,7 @@ def create_snapshot(project):
         print("Starting {0}...".format(i.id))
         i.start()
         i.wait_until_running()
-        print("Jobs all done!")
+    print("Jobs all done!")
     return
 
 
