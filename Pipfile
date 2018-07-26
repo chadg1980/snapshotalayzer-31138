@@ -12,3 +12,4 @@ click = "*"
 
 [dev-packages]
 ipython = "*"
+setuptools = "*"
